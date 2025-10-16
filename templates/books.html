@@ -25,29 +25,38 @@
     <td>{{ book.publisher }}</td>
     <td>{{ book.isbn }}</td>
     <td>
-      <!-- TODO: ha ki van kölcsönözve, az alábbiak helyett írja ki, kinél van, és legyen egy Return gomb a visszahozáshoz -->
+      {% if book.borrowed %}
+      <div>
+        Ki van kölcsönözve: {{ book.borrowed_by }}
+        <form action="/checkout" method="post" style="display:inline">
+          <input type="hidden" name="isbn" value="{{ book.isbn }}" />
+          <input type="hidden" name="action" value="return" />
+          <button type="submit">Return</button>
+        </form>
+      </div>
+      {% else %}
       <form action="/checkout" method="post">
-        <input type="hidden" name="id" value="{{ book.id }}" />
+        <input type="hidden" name="isbn" value="{{ book.isbn }}" />
+        <input type="hidden" name="action" value="borrow" />
         <select name="neptun">
           {% for member in members %}
-          <option name="neptun" value="{{ member.neptun }}">
-            {{ member.name }} ({{ member.neptun }})
-          </option>
+          <option value="{{ member.neptun }}">{{ member.name }} ({{ member.neptun }})</option>
           {% endfor %}
         </select>
-        <button>Checkout</button>
+        <button type="submit">Checkout</button>
       </form>
+      {% endif %}
     </td>
   </tr>
   {% endfor %}
 </table>
 <h3>Add book</h3>
 <form action="/books" method="POST">
-  <input type="text" name="author" placeholder="Author" />
-  <input type="text" name="title" placeholder="Title" />
-  <input type="number" name="year" placeholder="Year published" />
-  <input type="text" name="publisher" placeholder="Publisher" />
-  <input type="text" name="isbn" placeholder="ISBN" />
+  <input type="text" name="author" placeholder="Author" required />
+  <input type="text" name="title" placeholder="Title" required />
+  <input type="number" name="year" placeholder="Year published" required />
+  <input type="text" name="publisher" placeholder="Publisher" required />
+  <input type="text" name="isbn" placeholder="ISBN" required />
   <input type="submit" value="Add" />
 </form>
 {% endblock %}
